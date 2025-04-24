@@ -13,6 +13,20 @@ logger.Info("Program started");
 
 do
 {
+
+  Console.WriteLine("Wich table do you want to work on?");
+  Console.WriteLine("1) Categories");
+  Console.WriteLine("2) Products");
+  Console.WriteLine("Press enter to end Session");
+  string? main_choice = Console.ReadLine();
+
+
+
+
+
+
+
+if (main_choice == "1"){
   Console.WriteLine("1) Display categories");
   Console.WriteLine("2) Add category");
   Console.WriteLine("3) Display Category and related products");
@@ -118,6 +132,13 @@ do
     break;
   }
   Console.WriteLine();
+}
+else if(main_choice=="2")
+{}
+else if (string.IsNullOrEmpty(main_choice))
+{
+break;
+}
 } while (true);
 
 logger.Info("Program ended");
