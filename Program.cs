@@ -1,9 +1,16 @@
-﻿using NLog;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
-using NorthwindConsole.Model;
-using System.ComponentModel.DataAnnotations;
+﻿﻿using NLog;
+ using System.Linq;
+ using Microsoft.Extensions.Configuration;
+ using Microsoft.EntityFrameworkCore;
+ using NorthwindConsole.Model;
+ using System.ComponentModel.DataAnnotations;
+
+
+using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
+using Microsoft.Identity.Client;
+
+using NLog.LayoutRenderers;
 string path = Directory.GetCurrentDirectory() + "//nlog.config";
 
 // create instance of Logger
@@ -14,24 +21,14 @@ logger.Info("Program started");
 do
 {
 
-  Console.WriteLine("Wich table do you want to work on?");
-  Console.WriteLine("1) Categories");
-  Console.WriteLine("2) Products");
-  Console.WriteLine("Press enter to end Session");
-  string? main_choice = Console.ReadLine();
-
-
-
-
-
-
-
-if (main_choice == "1"){
   Console.WriteLine("1) Display categories");
   Console.WriteLine("2) Add category");
   Console.WriteLine("3) Display Category and related products");
   Console.WriteLine("4) Display all Categories and their related products");
-  Console.WriteLine("Enter to quit");
+  Console.WriteLine("5) ");
+  Console.WriteLine("6) ");
+  Console.WriteLine("7) Display records in product table");
+  Console.WriteLine("Press Enter to End Session");
   string? choice = Console.ReadLine();
   Console.Clear();
   logger.Info("Option {choice} selected", choice);
@@ -81,7 +78,7 @@ if (main_choice == "1"){
       else
       {
         logger.Info("Validation passed");
-        // TODO: save category to db
+  
       }
     }
     if (!isValid)
@@ -105,6 +102,7 @@ if (main_choice == "1"){
     }
     Console.ForegroundColor = ConsoleColor.White;
     int id = int.Parse(Console.ReadLine()!);
+
     Console.Clear();
     logger.Info($"CategoryId {id} selected");
     Category category = db.Categories.Include("Products").FirstOrDefault(c => c.CategoryId == id)!;
@@ -127,18 +125,62 @@ if (main_choice == "1"){
       }
     }
   }
+  else if (choice == "7")
+  {
+    var db = new DataContext();
+    var query = db.Products.OrderBy(p => p.ProductId);
+  
+    do{
+    Console.WriteLine("What do you want to view?");
+    Console.WriteLine("1) all Products");
+    Console.WriteLine("2) Discontinued Products");
+    Console.WriteLine("3) Active Products");
+    Console.WriteLine("0) to Main Menue");
+    string? c5choice = Console.ReadLine();
+  if (c5choice == "1")
+  {
+   foreach(var item in query)
+   {
+     Console.WriteLine($"{item.ProductId} - {item.ProductName} Discontinued = {item.Discontinued} ");
+   }
+  }
+  else if (c5choice == "2")
+  {
+ foreach(var item in query) if (item.Discontinued == true )
+ {
+  Console.WriteLine($"{item.ProductId} - {item.ProductName} Discontinued = {item.Discontinued} ");
+ }
+
+  }
+
+  else if (c5choice == "3")
+  {
+     foreach(var item in query) if (item.Discontinued == false )
+ {
+  Console.WriteLine($"{item.ProductId} - {item.ProductName} Discontinued = {item.Discontinued} ");
+ }
+  }
+  else if (c5choice == "0")
+  {
+    break;
+  }
+  else if (String.IsNullOrEmpty(c5choice))
+  {
+    logger.Error("Invalid input");
+  }
+      } while (true);
+   }
   else if (String.IsNullOrEmpty(choice))
   {
     break;
   }
   Console.WriteLine();
-}
-else if(main_choice=="2")
-{}
-else if (string.IsNullOrEmpty(main_choice))
-{
-break;
-}
+
+
+
+
+
 } while (true);
 
 logger.Info("Program ended");
+
