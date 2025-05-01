@@ -2,7 +2,7 @@
  using System.Linq;
  using Microsoft.Extensions.Configuration;
  using Microsoft.EntityFrameworkCore;
- using NorthwindConsole.Model;
+
  using System.ComponentModel.DataAnnotations;
 
 
@@ -25,9 +25,12 @@ do
   Console.WriteLine("2) Add category");
   Console.WriteLine("3) Display Category and related products");
   Console.WriteLine("4) Display all Categories and their related products");
-  Console.WriteLine("5) ");
-  Console.WriteLine("6) ");
+  Console.WriteLine("5) Add new records to the Products table");
+  Console.WriteLine("6) Edit a specified record from the Products table");
   Console.WriteLine("7) Display records in product table");
+  Console.WriteLine("8) Display a specific product");
+  Console.WriteLine("9) Display all Categories and their related active product data ");
+  Console.WriteLine("10) Display a specific Categorie and its related active product data ");
   Console.WriteLine("Press Enter to End Session");
   string? choice = Console.ReadLine();
   Console.Clear();
@@ -78,7 +81,7 @@ do
       else
       {
         logger.Info("Validation passed");
-  
+        db.AddCategory(category);
       }
     }
     if (!isValid)
@@ -107,11 +110,13 @@ do
     logger.Info($"CategoryId {id} selected");
     Category category = db.Categories.Include("Products").FirstOrDefault(c => c.CategoryId == id)!;
     Console.WriteLine($"{category.CategoryName} - {category.Description}");
-    foreach (Product p in category.Products)
+    #pragma warning disable CS8602 // Dereference of a possibly null reference.
+        foreach (var p in category.Products)
     {
       Console.WriteLine($"\t{p.ProductName}");
     }
-  }
+
+    }
   else if (choice == "4")
   {
     var db = new DataContext();
@@ -119,11 +124,41 @@ do
     foreach (var item in query)
     {
       Console.WriteLine($"{item.CategoryName}");
-      foreach (Product p in item.Products)
+
+            foreach (var p in item.Products)
       {
         Console.WriteLine($"\t{p.ProductName}");
       }
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+        }
+  }
+  else if (choice == "5" )
+  {
+      // display categories
+    var configuration = new ConfigurationBuilder()
+            .AddJsonFile($"appsettings.json");
+
+    var config = configuration.Build();
+
+    var db = new DataContext();
+    var query = db.Categories.OrderBy(p => p.CategoryName);
+
+   
+    Console.WriteLine($"{query.Count()} records returned");
+    
+    Console.WriteLine("Which Category do you want to add a product to?");
+    foreach (var item in query)
+    {
+      Console.WriteLine($"{item.CategoryId}){item.CategoryName} - {item.Description}");
     }
+    int id = int.Parse(Console.ReadLine()!);
+    
+
+  }
+  else if (choice == "6")
+  {
+
   }
   else if (choice == "7")
   {
@@ -135,20 +170,20 @@ do
     Console.WriteLine("1) all Products");
     Console.WriteLine("2) Discontinued Products");
     Console.WriteLine("3) Active Products");
-    Console.WriteLine("0) to Main Menue");
+    Console.WriteLine("0) to Main Menu");
     string? c5choice = Console.ReadLine();
   if (c5choice == "1")
   {
    foreach(var item in query)
    {
-     Console.WriteLine($"{item.ProductId} - {item.ProductName} Discontinued = {item.Discontinued} ");
+     Console.WriteLine($"{item.ProductId} - {item.ProductName} (Discontinued = {item.Discontinued}) ");
    }
   }
   else if (c5choice == "2")
   {
  foreach(var item in query) if (item.Discontinued == true )
  {
-  Console.WriteLine($"{item.ProductId} - {item.ProductName} Discontinued = {item.Discontinued} ");
+  Console.WriteLine($"{item.ProductId} - {item.ProductName} ");
  }
 
   }
@@ -157,22 +192,28 @@ do
   {
      foreach(var item in query) if (item.Discontinued == false )
  {
-  Console.WriteLine($"{item.ProductId} - {item.ProductName} Discontinued = {item.Discontinued} ");
+  Console.WriteLine($"{item.ProductId} - {item.ProductName} ");
  }
   }
+  
   else if (c5choice == "0")
   {
     break;
   }
-  else if (String.IsNullOrEmpty(c5choice))
-  {
-    logger.Error("Invalid input");
+   
+  else
+   {
+   logger.Error("Invalid input");
   }
       } while (true);
    }
+
   else if (String.IsNullOrEmpty(choice))
   {
     break;
+  }
+  else {
+    logger.Error("Invalid input");
   }
   Console.WriteLine();
 
