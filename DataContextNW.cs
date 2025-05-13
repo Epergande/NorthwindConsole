@@ -11,17 +11,20 @@ public class DataContext : DbContext
     this.Categories.Add(category);
     this.SaveChanges();
   }
-  /*public void AddPost(Post post)
+  public void AddProduct(Product product)
   {
-    this.Posts.Add(post);
+    this.Products.Add(product);
     this.SaveChanges();
   }
-    public void EditBlog(Blog UpdatedBlog)
+  
+    public void EditProduct(Product UpdatedProduct)
    {
-     Blog blog = Blogs.Find(UpdatedBlog.BlogId)!;
-     blog.Name = UpdatedBlog.Name;
+     Product product = Products.Find(UpdatedProduct.ProductId)!;
+     product.ProductName = UpdatedProduct.ProductName;
      this.SaveChanges();
    }
+   
+   /*
     public void DeleteBlog(Blog blog)
    {
      this.Blogs.Remove(blog);

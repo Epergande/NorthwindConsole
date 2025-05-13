@@ -30,7 +30,7 @@ do
   Console.WriteLine("7) Display records in product table");
   Console.WriteLine("8) Display a specific product");
   Console.WriteLine("9) Display all Categories and their related active product data ");
-  Console.WriteLine("10) Display a specific Categorie and its related active product data ");
+  Console.WriteLine("10) Display a specific Category and its related active product data ");
   Console.WriteLine("Press Enter to End Session");
   string? choice = Console.ReadLine();
   Console.Clear();
@@ -133,29 +133,45 @@ do
 
         }
   }
-  else if (choice == "5" )
+  else if (choice =="5")
   {
-      // display categories
-    var configuration = new ConfigurationBuilder()
-            .AddJsonFile($"appsettings.json");
-
-    var config = configuration.Build();
-
-    var db = new DataContext();
+     var db = new DataContext();
     var query = db.Categories.OrderBy(p => p.CategoryName);
-
-   
-    Console.WriteLine($"{query.Count()} records returned");
-    
-    Console.WriteLine("Which Category do you want to add a product to?");
+     Console.WriteLine("Which Category do you want to add a product to?");
+  
     foreach (var item in query)
     {
-      Console.WriteLine($"{item.CategoryId}){item.CategoryName} - {item.Description}");
+        Console.WriteLine($"{item.CategoryId} ({item.CategoryName})");
     }
-    int id = int.Parse(Console.ReadLine()!);
-    
 
+    
+    string? inputID = Console.ReadLine();
+    
+    if (int.TryParse(inputID, out int chosenId) && query.Any(b => b.CategoryId == chosenId))
+    {
+        Console.Write("Enter a Name for the product: ");
+        var name = Console.ReadLine();
+        if (string.IsNullOrEmpty(name))
+        {
+            logger.Error("Product Name cannot be empty");
+            return;
+        }
+          var product = new Product
+        {
+            ProductName = name,            
+            CategoryID = chosenId
+        };
+
+
+        db.AddProduct(product);
+        logger.Info($"Product '{name}' successfully created in Category ID {chosenId}");
+    }
+    else
+    {
+        logger.Error("Invalid Category ID selected.");
+    }
   }
+  
   else if (choice == "6")
   {
 
@@ -200,14 +216,39 @@ do
   {
     break;
   }
-   
+
   else
    {
    logger.Error("Invalid input");
   }
       } while (true);
    }
+else if (choice == "8")
+{
+  
+ var db = new DataContext();
+    var query = db.Categories.OrderBy(p => p.CategoryId);
 
+   Console.WriteLine("Which category do you want to view a product from? ");
+
+    foreach (var item in query)
+    {
+      Console.WriteLine($"{item.CategoryId}) {item.CategoryName}");
+    }
+
+    int id = int.Parse(Console.ReadLine()!);
+    var query2 = db.Products.OrderBy(p => p.ProductId);
+    Console.WriteLine("Which Product do you want to view?");
+    foreach (var item in query2) if (item.CategoryID == id)
+    {
+     Console.WriteLine($"{item.ProductId}) {item.ProductName}");
+    }
+     
+    else {
+      logger.Error("No category With that id");
+    }
+    int idp = int.Parse(Console.ReadLine()!);
+}
   else if (String.IsNullOrEmpty(choice))
   {
     break;
