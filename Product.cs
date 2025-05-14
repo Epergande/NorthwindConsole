@@ -5,6 +5,7 @@ public class Product
   
   public bool Discontinued {get; set;}
 
+public Int16 UnitsInStock {get; set;}
   public int CategoryID { get; set; }
   public Category? category { get; set; }
 }

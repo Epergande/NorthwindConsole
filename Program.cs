@@ -188,38 +188,38 @@ do
         Console.WriteLine($"{item.CategoryId} ({item.CategoryName})");
       }
 
-    if (!int.TryParse(Console.ReadLine(), out int chosenCategoryId) || !categories.Any(c => c.CategoryId == chosenCategoryId))
+    if (!int.TryParse(Console.ReadLine(), out int Id) || !categories.Any(c => c.CategoryId == Id))
     {
-       Console.WriteLine("Invalid category selection.");
+       logger.Error("Invalid input");
        break;
     }
 
-    var productsInCategory = db.Products.Where(p => p.CategoryID == chosenCategoryId).OrderBy(p => p.ProductId).ToList();
-    if (!productsInCategory.Any())
+    var query2 = db.Products.Where(p => p.CategoryID == Id).OrderBy(p => p.ProductId).ToList();
+    if (!query2.Any())
     {
-        Console.WriteLine("No products found in this category.");
+        logger.Error("invalid input");
         break;
     }
-
+logger.Info($"choice {Id} selected");
     Console.WriteLine("Which Product do you want to edit?");
-    foreach (var item in productsInCategory)
+    foreach (var item in query2)
     {
         Console.WriteLine($"{item.ProductId}) {item.ProductName}");
     }
 
-    if (!int.TryParse(Console.ReadLine(), out int chosenProductId) || !productsInCategory.Any(p => p.ProductId == chosenProductId))
+    if (!int.TryParse(Console.ReadLine(), out int Id2) || !query2.Any(p => p.ProductId == Id2))
     {
-        Console.WriteLine("Invalid product selection.");
+        logger.Error("Invalid product selection.");
         return;
     }
-
+logger.Info($"choice {Id2} selected");
  
     Product? updatedProduct = InputProduct(db, logger);
     if (updatedProduct != null)
     {
-        updatedProduct.ProductId = chosenProductId;
+        updatedProduct.ProductId = Id2;
         db.EditProduct(updatedProduct);
-        logger.Info($"Product (id: {chosenProductId}) updated");
+        logger.Info($"Product (id: {Id2}) updated");
     }
   }
   else if (choice == "7")
@@ -271,7 +271,7 @@ do
    }
 else if (choice == "8")
 {
-  
+  /*
  var db = new DataContext();
     var query = db.Categories.OrderBy(p => p.CategoryId);
 
@@ -285,15 +285,56 @@ else if (choice == "8")
     int id = int.Parse(Console.ReadLine()!);
     var query2 = db.Products.OrderBy(p => p.ProductId);
     Console.WriteLine("Which Product do you want to view?");
-    foreach (var item in query2) if (item.CategoryID == id)
+    if (b => b.CategoryID == id)
+    {
+    foreach (var item in query2) 
     {
      Console.WriteLine($"{item.ProductId}) {item.ProductName}");
     }
-     
+    }
     else {
       logger.Error("No category With that id");
     }
-    int idp = int.Parse(Console.ReadLine()!);
+    int idp = int.Parse(Console.ReadLine()!);*/
+     var db = new DataContext();
+
+    var categories = db.Categories.OrderBy(p => p.CategoryName).ToList();
+    Console.WriteLine("Which Category do you want to view a product in?");
+    foreach (var item in categories)
+    {
+        Console.WriteLine($"{item.CategoryId} ({item.CategoryName})");
+      }
+
+    if (!int.TryParse(Console.ReadLine(), out int Id) || !categories.Any(c => c.CategoryId == Id))
+    {
+       logger.Error("Invalid input");
+       break;
+    }
+
+    var query2 = db.Products.Where(p => p.CategoryID == Id).OrderBy(p => p.ProductId).ToList();
+    if (!query2.Any())
+    {
+        logger.Error("invalid input");
+        break;
+    }
+logger.Info($"choice {Id} selected");
+    Console.WriteLine("Which Product do you want to view?");
+    foreach (var item in query2)
+    {
+        Console.WriteLine($"{item.ProductId}) {item.ProductName}");
+    }
+
+    if (!int.TryParse(Console.ReadLine(), out int Id2) || !query2.Any(p => p.ProductId == Id2))
+    {
+        logger.Error("Invalid product selection.");
+        return;
+    }
+logger.Info($"choice {Id2} selected");
+var query3 = db.Products.Where(p => p.ProductId == Id2);
+foreach(var item in query3)
+{
+  Console.WriteLine($"{item.ProductId}: {item.ProductName} Units in stock: {item.UnitsInStock} (Discontinued = {item.Discontinued})");
+}
 }
   else if (String.IsNullOrEmpty(choice))
   {
