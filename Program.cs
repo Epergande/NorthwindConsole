@@ -11,6 +11,7 @@ using System.Xml.Serialization;
 using Microsoft.Identity.Client;
 
 using NLog.LayoutRenderers;
+using Microsoft.EntityFrameworkCore.Metadata;
 string path = Directory.GetCurrentDirectory() + "//nlog.config";
 
 // create instance of Logger
@@ -99,12 +100,14 @@ do
 
     Console.WriteLine("Select the category whose products you want to display:");
     Console.ForegroundColor = ConsoleColor.DarkRed;
+   
     foreach (var item in query)
     {
       Console.WriteLine($"{item.CategoryId}) {item.CategoryName}");
     }
     Console.ForegroundColor = ConsoleColor.White;
     int id = int.Parse(Console.ReadLine()!);
+
 
     Console.Clear();
     logger.Info($"CategoryId {id} selected");
@@ -115,8 +118,9 @@ do
     {
       Console.WriteLine($"\t{p.ProductName}");
     }
+}
 
-    }
+    
   else if (choice == "4")
   {
     var db = new DataContext();
@@ -175,6 +179,48 @@ do
   else if (choice == "6")
   {
 
+    var db = new DataContext();
+
+    var categories = db.Categories.OrderBy(p => p.CategoryName).ToList();
+    Console.WriteLine("Which Category do you want to edit a product in?");
+    foreach (var item in categories)
+    {
+        Console.WriteLine($"{item.CategoryId} ({item.CategoryName})");
+      }
+
+    if (!int.TryParse(Console.ReadLine(), out int chosenCategoryId) || !categories.Any(c => c.CategoryId == chosenCategoryId))
+    {
+       Console.WriteLine("Invalid category selection.");
+       break;
+    }
+
+    var productsInCategory = db.Products.Where(p => p.CategoryID == chosenCategoryId).OrderBy(p => p.ProductId).ToList();
+    if (!productsInCategory.Any())
+    {
+        Console.WriteLine("No products found in this category.");
+        break;
+    }
+
+    Console.WriteLine("Which Product do you want to edit?");
+    foreach (var item in productsInCategory)
+    {
+        Console.WriteLine($"{item.ProductId}) {item.ProductName}");
+    }
+
+    if (!int.TryParse(Console.ReadLine(), out int chosenProductId) || !productsInCategory.Any(p => p.ProductId == chosenProductId))
+    {
+        Console.WriteLine("Invalid product selection.");
+        return;
+    }
+
+ 
+    Product? updatedProduct = InputProduct(db, logger);
+    if (updatedProduct != null)
+    {
+        updatedProduct.ProductId = chosenProductId;
+        db.EditProduct(updatedProduct);
+        logger.Info($"Product (id: {chosenProductId}) updated");
+    }
   }
   else if (choice == "7")
   {
@@ -266,3 +312,38 @@ else if (choice == "8")
 
 logger.Info("Program ended");
 
+
+ static Product? InputProduct(DataContext db, NLog.Logger logger)
+ {
+   Product product = new();
+   Console.WriteLine("Enter the Product name");
+   product.ProductName = Console.ReadLine();
+ 
+   ValidationContext context = new(product, null, null);
+   List<ValidationResult> results = [];
+ 
+   var isValid = Validator.TryValidateObject(product, context, results, true);
+   if (isValid)
+   {
+     // check for unique name
+     if (db.Products.Any(b => b.ProductName == product.ProductName))
+     {
+       // generate validation error
+       isValid = false;
+       results.Add(new ValidationResult("Product name exists", ["Name"]));
+     }
+     else
+     {
+       logger.Info("Validation passed");
+     }
+   }
+   if (!isValid)
+   {
+     foreach (var result in results)
+     {
+       logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
+     }
+     return null;
+   }
+   return product;
+ }
