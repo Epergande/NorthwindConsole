@@ -96,7 +96,7 @@ do
   }
   else if (choice == "2")
   {
-/*Console.WriteLine("Choose the Category to edit:");
+Console.WriteLine("Choose the Category to edit:");
    var db = new DataContext();
        
   var category = GetCategory(db);
@@ -107,11 +107,11 @@ do
        Category? UpdatedCategory = InputCategory(db, logger);
        if (UpdatedCategory != null)
        {
-         UpdatedCategory = category.CategoryId;
+         UpdatedCategory.CategoryId = category.CategoryId;
          db.EditCategory(UpdatedCategory);
          logger.Info($"Blog (id: {category.CategoryId}) updated");
        }
-     }*/
+     }
   }
   else if (choice == "3")
 
@@ -292,31 +292,6 @@ logger.Info($"choice {Id2} selected");
    }
 else if (choice == "8")
 {
-  /*
- var db = new DataContext();
-    var query = db.Categories.OrderBy(p => p.CategoryId);
-
-   Console.WriteLine("Which category do you want to view a product from? ");
-
-    foreach (var item in query)
-    {
-      Console.WriteLine($"{item.CategoryId}) {item.CategoryName}");
-    }
-
-    int id = int.Parse(Console.ReadLine()!);
-    var query2 = db.Products.OrderBy(p => p.ProductId);
-    Console.WriteLine("Which Product do you want to view?");
-    if (b => b.CategoryID == id)
-    {
-    foreach (var item in query2) 
-    {
-     Console.WriteLine($"{item.ProductId}) {item.ProductName}");
-    }
-    }
-    else {
-      logger.Error("No category With that id");
-    }
-    int idp = int.Parse(Console.ReadLine()!);*/
      var db = new DataContext();
 
     var categories = db.Categories.OrderBy(p => p.CategoryName).ToList();
@@ -338,7 +313,7 @@ else if (choice == "8")
         logger.Error("invalid input");
         break;
     }
-logger.Info($"choice {Id} selected");
+  logger.Info($"choice {Id} selected");
     Console.WriteLine("Which Product do you want to view?");
     foreach (var item in query2)
     {
@@ -350,12 +325,12 @@ logger.Info($"choice {Id} selected");
         logger.Error("Invalid product selection.");
         return;
     }
-logger.Info($"choice {Id2} selected");
-var query3 = db.Products.Where(p => p.ProductId == Id2);
-foreach(var item in query3)
-{
-  Console.WriteLine($"{item.ProductId}: {item.ProductName} Units in stock: {item.UnitsInStock} (Discontinued = {item.Discontinued})");
-}
+  logger.Info($"choice {Id2} selected");
+    var query3 = db.Products.Where(p => p.ProductId == Id2);
+  foreach(var item in query3)
+  {
+    Console.WriteLine($"{item.ProductId}: {item.ProductName} Units in stock: {item.UnitsInStock} (Discontinued = {item.Discontinued})");
+  }
 }
 else if (choice == "9")
 {
@@ -457,7 +432,7 @@ logger.Info("Program ended, Have a nice day :)");
    }
    return product;
  }
- /*static Category? InputCategory(DataContext db, NLog.Logger logger)
+ static Category? InputCategory(DataContext db, NLog.Logger logger)
  {
    Category category = new();
    Console.WriteLine("Enter the Category name");
@@ -506,4 +481,4 @@ logger.Info("Program ended, Have a nice day :)");
      return category;
    }
    return null;
- }*/
+ }
