@@ -21,9 +21,9 @@ logger.Info("Program started");
 
 do
 {
-
-  Console.WriteLine("1) Display categories");
-  Console.WriteLine("2) Add category");
+  Console.WriteLine("0) Display categories");
+  Console.WriteLine("1) Add category");
+   Console.WriteLine("2) Edit categories");
   Console.WriteLine("3) Display Category and related products");
   Console.WriteLine("4) Display all Categories and their related products");
   Console.WriteLine("5) Add new records to the Products table");
@@ -37,7 +37,7 @@ do
   Console.Clear();
   logger.Info("Option {choice} selected", choice);
 
-  if (choice == "1")
+  if (choice == "0")
   {
     // display categories
     var configuration = new ConfigurationBuilder()
@@ -49,7 +49,7 @@ do
     var query = db.Categories.OrderBy(p => p.CategoryName);
 
     Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"{query.Count()} records returned");
+    logger.Info($"{query.Count()} records returned");
     Console.ForegroundColor = ConsoleColor.Magenta;
     foreach (var item in query)
     {
@@ -57,7 +57,7 @@ do
     }
     Console.ForegroundColor = ConsoleColor.White;
   }
-  else if (choice == "2")
+  else if (choice == "1")
   {
     // Add category
     Category category = new();
@@ -93,7 +93,27 @@ do
       }
     }
   }
+  else if (choice == "2")
+  {
+/*Console.WriteLine("Choose the Category to edit:");
+   var db = new DataContext();
+       
+  var category = GetCategory(db);
+  
+     if (category != null)
+     {
+
+       Category? UpdatedCategory = InputCategory(db, logger);
+       if (UpdatedCategory != null)
+       {
+         UpdatedCategory = category.CategoryId;
+         db.EditCategory(UpdatedCategory);
+         logger.Info($"Blog (id: {category.CategoryId}) updated");
+       }
+     }*/
+  }
   else if (choice == "3")
+
   {
     var db = new DataContext();
     var query = db.Categories.OrderBy(p => p.CategoryId);
@@ -114,7 +134,7 @@ do
     Category category = db.Categories.Include("Products").FirstOrDefault(c => c.CategoryId == id)!;
     Console.WriteLine($"{category.CategoryName} - {category.Description}");
     #pragma warning disable CS8602 // Dereference of a possibly null reference.
-        foreach (var p in category.Products)
+        foreach (var p in category.Products) 
     {
       Console.WriteLine($"\t{p.ProductName}");
     }
@@ -336,6 +356,33 @@ foreach(var item in query3)
   Console.WriteLine($"{item.ProductId}: {item.ProductName} Units in stock: {item.UnitsInStock} (Discontinued = {item.Discontinued})");
 }
 }
+else if (choice == "9")
+{
+      var db = new DataContext();
+    var query = db.Categories.OrderBy(p => p.CategoryId);
+
+    Console.WriteLine("Select the category whose products you want to display:");
+    Console.ForegroundColor = ConsoleColor.DarkRed;
+   
+    foreach (var item in query)
+    {
+      Console.WriteLine($"{item.CategoryId}) {item.CategoryName}");
+    }
+    Console.ForegroundColor = ConsoleColor.White;
+    int id = int.Parse(Console.ReadLine()!);
+
+
+    Console.Clear();
+    logger.Info($"CategoryId {id} selected");
+    Category category = db.Categories.Include("Products").FirstOrDefault(c => c.CategoryId == id)!;
+    Console.WriteLine($"{category.CategoryName} - {category.Description}");
+    #pragma warning disable CS8602 // Dereference of a possibly null reference.
+        foreach (var p in category.Products) if (p.Discontinued == false)
+    {
+      Console.WriteLine($"\t{p.ProductName} {p.Discontinued}");
+    }
+
+}
   else if (String.IsNullOrEmpty(choice))
   {
     break;
@@ -351,7 +398,9 @@ foreach(var item in query3)
 
 } while (true);
 
-logger.Info("Program ended");
+
+
+logger.Info("Program ended, Have a nice day :)");
 
 
  static Product? InputProduct(DataContext db, NLog.Logger logger)
@@ -388,3 +437,53 @@ logger.Info("Program ended");
    }
    return product;
  }
+ /*static Category? InputCategory(DataContext db, NLog.Logger logger)
+ {
+   Category category = new();
+   Console.WriteLine("Enter the Category name");
+   category.CategoryName = Console.ReadLine();
+ 
+   ValidationContext context = new(category, null, null);
+   List<ValidationResult> results = [];
+ 
+   var isValid = Validator.TryValidateObject(category, context, results, true);
+   if (isValid)
+   {
+     // check for unique name
+     if (db.Categories.Any(b => b.CategoryName == category.CategoryName))
+     {
+       // generate validation error
+       isValid = false;
+       results.Add(new ValidationResult("Blog name exists", ["Name"]));
+     }
+     else
+     {
+       logger.Info("Validation passed");
+     }
+   }
+   if (!isValid)
+   {
+     foreach (var result in results)
+     {
+       logger.Error($"{result.MemberNames.First()} : {result.ErrorMessage}");
+     }
+     return null;
+   }
+   return category;
+ }
+ static Category? GetCategory(DataContext db)
+ {
+   // display all blogs
+  
+   var categories = db.Categories.OrderBy(b => b.CategoryId);
+   foreach (Category b in categories)
+   {
+     Console.WriteLine($"{b.CategoryId}: {b.CategoryName}");
+   }
+   if (int.TryParse(Console.ReadLine(), out int CategoryID))
+   {
+     Category category = db.Categories.FirstOrDefault(b => b.CategoryId == CategoryID)!;
+     return category;
+   }
+   return null;
+ }*/

@@ -16,7 +16,12 @@ public class DataContext : DbContext
     this.Products.Add(product);
     this.SaveChanges();
   }
-  
+    public void EditCategory(Category UpdatedCategory)
+   {
+     Category category = Categories.Find(UpdatedCategory.CategoryId)!;
+     category.CategoryName = UpdatedCategory.CategoryName;
+     this.SaveChanges();
+   }
     public void EditProduct(Product UpdatedProduct)
    {
      Product product = Products.Find(UpdatedProduct.ProductId)!;
