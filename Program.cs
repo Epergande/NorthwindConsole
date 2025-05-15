@@ -12,6 +12,7 @@ using Microsoft.Identity.Client;
 
 using NLog.LayoutRenderers;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 string path = Directory.GetCurrentDirectory() + "//nlog.config";
 
 // create instance of Logger
@@ -358,7 +359,26 @@ foreach(var item in query3)
 }
 else if (choice == "9")
 {
-      var db = new DataContext();
+
+  var db = new DataContext();
+    var query = db.Categories.Include("Products").OrderBy(p => p.CategoryId);
+    foreach (var item in query)
+    {
+      Console.WriteLine($"{item.CategoryName}");
+
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            foreach (var p in item.Products) if (p.Discontinued == false)
+      {
+        Console.WriteLine($"\t{p.ProductName}");
+      }
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
+
+        }
+}
+else if (choice == "10")
+{
+        var db = new DataContext();
     var query = db.Categories.OrderBy(p => p.CategoryId);
 
     Console.WriteLine("Select the category whose products you want to display:");
