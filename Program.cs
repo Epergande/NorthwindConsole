@@ -135,6 +135,7 @@ Console.WriteLine("Choose the Category to edit:");
     Category category = db.Categories.Include("Products").FirstOrDefault(c => c.CategoryId == id)!;
     Console.WriteLine($"{category.CategoryName} - {category.Description}");
     #pragma warning disable CS8602 // Dereference of a possibly null reference.
+      
         foreach (var p in category.Products) 
     {
       Console.WriteLine($"\t{p.ProductName}");
@@ -146,6 +147,7 @@ Console.WriteLine("Choose the Category to edit:");
   {
     var db = new DataContext();
     var query = db.Categories.Include("Products").OrderBy(p => p.CategoryId);
+     
     foreach (var item in query)
     {
       Console.WriteLine($"{item.CategoryName}");
@@ -212,14 +214,14 @@ Console.WriteLine("Choose the Category to edit:");
     if (!int.TryParse(Console.ReadLine(), out int Id) || !categories.Any(c => c.CategoryId == Id))
     {
        logger.Error("Invalid input");
-       break;
+       return;
     }
 
     var query2 = db.Products.Where(p => p.CategoryID == Id).OrderBy(p => p.ProductId).ToList();
     if (!query2.Any())
     {
         logger.Error("invalid input");
-        break;
+        return;
     }
 logger.Info($"choice {Id} selected");
     Console.WriteLine("Which Product do you want to edit?");
@@ -255,8 +257,10 @@ logger.Info($"choice {Id2} selected");
     Console.WriteLine("3) Active Products");
     Console.WriteLine("0) to Main Menu");
     string? c5choice = Console.ReadLine();
+    logger.Info($"option {c5choice} selected");
   if (c5choice == "1")
   {
+      logger.Info($"{query.Count()} records returned");
    foreach(var item in query)
    {
      Console.WriteLine($"{item.ProductId} - {item.ProductName} (Discontinued = {item.Discontinued}) ");
@@ -264,6 +268,7 @@ logger.Info($"choice {Id2} selected");
   }
   else if (c5choice == "2")
   {
+ 
  foreach(var item in query) if (item.Discontinued == true )
  {
   Console.WriteLine($"{item.ProductId} - {item.ProductName} ");
@@ -273,6 +278,7 @@ logger.Info($"choice {Id2} selected");
 
   else if (c5choice == "3")
   {
+
      foreach(var item in query) if (item.Discontinued == false )
  {
   Console.WriteLine($"{item.ProductId} - {item.ProductName} ");
@@ -281,6 +287,7 @@ logger.Info($"choice {Id2} selected");
   
   else if (c5choice == "0")
   {
+    logger.Info("Returning to main menu");
     break;
   }
 
@@ -480,5 +487,6 @@ logger.Info("Program ended, Have a nice day :)");
      Category category = db.Categories.FirstOrDefault(b => b.CategoryId == CategoryID)!;
      return category;
    }
+  
    return null;
  }
